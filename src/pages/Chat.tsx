@@ -1,50 +1,76 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { sendMessage, getChatHistory } from '../api/chat'
+import type { ChatHistoryItem } from '../api/types'
 
 interface Message {
   id: number
   sender: 'user' | 'ai'
   content: string
-  workout?: {
-    title: string
-    exercises: Array<{
-      name: string
-      distance?: string
-      rest?: string
-    }>
-    tips: string
-  }
+  sessionId?: number
+}
+
+function historyToMessages(items: ChatHistoryItem[]): Message[] {
+  return items
+    .slice()
+    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+    .map(item => ({
+      id: item.id,
+      sender: 'ai' as const,
+      content: item.content,
+      sessionId: item.id,
+    }))
 }
 
 export default function Chat() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      sender: 'ai',
-      content: 'Вчера была выносливость — сегодня сделаем технику. Вот программа на 45 минут:',
-      workout: {
-        title: 'Техника кроля · 1 600м · 25м бассейн',
-        exercises: [
-          { name: 'Разминка', distance: '400м кроль' },
-          { name: '8×50м кроль', rest: 'отд. 20с' },
-          { name: '4×100м комплекс', rest: 'отд. 40с' },
-          { name: 'Заминка', distance: '200м спокойно' },
-        ],
-        tips: 'Совет: следи за входом руки в воду',
-      },
-    },
-  ])
+  const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState('')
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState('')
+  const [loadingHistory, setLoadingHistory] = useState(true)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const handleSend = () => {
-    if (!inputValue.trim()) return
-    const newMessage: Message = {
-      id: messages.length + 1,
+  useEffect(() => {
+    getChatHistory()
+      .then(items => setMessages(historyToMessages(items)))
+      .catch(() => {})
+      .finally(() => setLoadingHistory(false))
+  }, [])
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  const handleSend = async (text?: string) => {
+    const msg = (text ?? inputValue).trim()
+    if (!msg || sending) return
+
+    const userMsg: Message = {
+      id: Date.now(),
       sender: 'user',
-      content: inputValue,
+      content: msg,
     }
-    setMessages([...messages, newMessage])
+    setMessages(prev => [...prev, userMsg])
     setInputValue('')
+    setSending(true)
+    setError('')
+
+    try {
+      const response = await sendMessage(msg)
+      const aiMsg: Message = {
+        id: Date.now() + 1,
+        sender: 'ai',
+        content: response.reply,
+        sessionId: response.session_id ?? undefined,
+      }
+      setMessages(prev => [...prev, aiMsg])
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Ошибка отправки')
+    } finally {
+      setSending(false)
+    }
   }
+
+  const quickActions = ['Тренировка на сегодня', 'Восстановительная', 'Скоростная', 'Задать вопрос']
 
   return (
   <div className="h-[calc(100vh-4rem)] sm:h-[calc(100vh-8rem)] flex flex-col pt-12 lg:pt-0">
@@ -91,7 +117,7 @@ export default function Chat() {
           className="flex-1 bg-surface border border-surface-light rounded-xl px-3 sm:px-6 py-3 sm:py-4 text-sm sm:text-base text-text placeholder-text-muted focus:outline-none focus:border-primary/50 transition-colors"
         />
         <button
-          onClick={handleSend}
+          onClick={() => handleSend()}
           className="px-4 sm:px-6 py-3 sm:py-4 bg-primary rounded-xl text-white font-semibold hover:bg-primary-dark transition-colors text-sm sm:text-base"
         >
           ↑
