@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
-import Sidebar, { sidebarExpanded } from './components/Sidebar.tsx'
+import Sidebar from './components/Sidebar.tsx'
 import Dashboard from './pages/Dashboard.tsx'
 import Chat from './pages/Chat.tsx'
 import History from './pages/History.tsx'
@@ -8,26 +8,26 @@ import Profile from './pages/Profile.tsx'
 import Tariffs from './pages/Tariffs.tsx'
 
 function App() {
-  const [marginLeft, setMarginLeft] = useState(80)
-
-  // Синхронизируем отступ с состоянием sidebar
-  useEffect(() => {
-    const updateMargin = () => {
-      setMarginLeft(sidebarExpanded ? 256 : 80)
-    }
-    
-    // Обновляем часто для плавной анимации
-    const interval = setInterval(updateMargin, 50)
-    return () => clearInterval(interval)
-  }, [])
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
     <div className="flex min-h-screen bg-background text-text">
-      <Sidebar />
-      <main 
-        className="flex-1 transition-all duration-300 ease-in-out p-8"
-        style={{ marginLeft: `${marginLeft}px` }}
-      >
+      <Sidebar 
+        isOpen={isMobileMenuOpen} 
+        onClose={() => setIsMobileMenuOpen(false)} 
+      />
+      
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 lg:ml-0">
+        {/* Кнопка гамбургер (только для мобильных) */}
+        <button 
+          onClick={() => setIsMobileMenuOpen(true)}
+          className="lg:hidden fixed top-4 left-4 z-30 p-3 bg-surface border border-surface-light rounded-lg text-text hover:bg-surface-light/70 transition-all shadow-lg"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/chat" element={<Chat />} />

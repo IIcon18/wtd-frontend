@@ -46,23 +46,24 @@ export default function Tariffs() {
   ]
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 lg:space-y-8 pt-12 lg:pt-0">
       <div>
-        <h1 className="text-3xl font-bold text-text mb-2">Тарифы</h1>
-        <p className="text-text-secondary">Выбери подходящий формат</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-text mb-2">Тарифы</h1>
+        <p className="text-text-secondary text-sm sm:text-base">Выбери подходящий формат</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Тарифы - одна колонка на мобильных */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
         {tariffs.map((tariff) => (
           <div
             key={tariff.name}
-            className={`relative bg-surface rounded-2xl p-8 border ${
+            className={`relative bg-surface rounded-2xl p-4 sm:p-6 lg:p-8 border ${
               tariff.popular ? 'border-primary shadow-lg shadow-primary/10' : 'border-surface-light'
             } hover:border-primary/30 transition-all duration-300`}
           >
             {tariff.popular && (
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <span className="bg-primary text-white text-xs font-bold px-4 py-1 rounded-full">
+              <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2">
+                <span className="bg-primary text-white text-xs font-bold px-3 sm:px-4 py-1 rounded-full whitespace-nowrap">
                   Популярный
                 </span>
               </div>
@@ -71,28 +72,28 @@ export default function Tariffs() {
             <div className="mb-6">
               <h3 className="text-text-secondary text-sm font-medium mb-2">{tariff.name}</h3>
               <div className="flex items-baseline gap-1 mb-2">
-                <span className="text-5xl font-bold text-text">{tariff.price}</span>
-                <span className="text-text-secondary">{tariff.period}</span>
+                <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-text">{tariff.price}</span>
+                <span className="text-text-secondary text-sm">{tariff.period}</span>
               </div>
-              <p className="text-text-secondary text-sm">{tariff.description}</p>
+              <p className="text-text-secondary text-xs sm:text-sm">{tariff.description}</p>
             </div>
 
-            <ul className="space-y-4 mb-8">
+            <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
               {tariff.features.map((feature, idx) => (
                 <li key={idx} className="flex items-center gap-3">
-                  <span className={`w-5 h-5 flex items-center justify-center rounded-full ${
+                  <span className={`w-5 h-5 flex items-center justify-center rounded-full text-xs sm:text-sm ${
                     feature.included ? 'text-success' : 'text-text-muted'
                   }`}>
                     {feature.included ? '✓' : '−'}
                   </span>
-                  <span className={`text-sm ${feature.included ? 'text-text' : 'text-text-muted'}`}>
+                  <span className={`text-xs sm:text-sm ${feature.included ? 'text-text' : 'text-text-muted'}`}>
                     {feature.text}
                   </span>
                 </li>
               ))}
             </ul>
 
-            <button className={`w-full py-3 rounded-lg font-semibold transition-all ${
+            <button className={`w-full py-2.5 sm:py-3 rounded-lg font-semibold transition-all text-sm sm:text-base ${
               tariff.popular
                 ? 'bg-primary text-white hover:bg-primary-dark'
                 : 'bg-surface-light text-text-secondary hover:text-text hover:border-primary/30 border border-surface-light'

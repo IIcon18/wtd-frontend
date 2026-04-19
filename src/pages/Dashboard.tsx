@@ -1,10 +1,9 @@
 import StatCard from '../components/StatCard'
 import WorkoutCard from '../components/WorkoutCard'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'
 
 export default function Dashboard() {
-    const navigate = useNavigate();
-
+  const navigate = useNavigate()
   const currentDate = new Date().toLocaleDateString("ru-RU", {
     weekday: "long",
     day: "numeric",
@@ -13,25 +12,25 @@ export default function Dashboard() {
   })
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 lg:space-y-8 pt-12 lg:pt-0">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-text mb-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-text mb-2">
           Привет, Алексей 👋
         </h1>
-        <p className="text-text-secondary capitalize">{currentDate}</p>
+        <p className="text-text-secondary capitalize text-sm sm:text-base">{currentDate}</p>
       </div>
 
       {/* Pro Badge */}
       <div className="inline-flex items-center gap-2 px-4 py-2 bg-success/10 border border-success/30 rounded-full">
         <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
-        <span className="text-success text-sm font-medium">
+        <span className="text-success text-xs sm:text-sm font-medium">
           Pro активна — до 9 мая 2025
         </span>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Stats Grid - адаптивная сетка */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
         <StatCard
           title="Тренировок за месяц"
           value="14"
@@ -53,16 +52,18 @@ export default function Dashboard() {
       </div>
 
       {/* CTA Button */}
-      <button onClick={() => navigate('/chat')} className="w-full py-4 bg-primary/10 border-2 border-primary/30 rounded-xl text-primary font-semibold hover:bg-primary/20 transition-all duration-300 flex items-center justify-center gap-2">
-        
+      <button 
+        onClick={() => navigate('/chat')}
+        className="w-full py-3 sm:py-4 bg-primary/10 border-2 border-primary/30 rounded-xl text-primary font-semibold hover:bg-primary/20 transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base"
+      >
         Получить тренировку на сегодня
         <span>→</span>
       </button>
 
       {/* Recent Workouts */}
       <div>
-        <h2 className="text-xl font-semibold text-text mb-4">Последние тренировки</h2>
-        <div className="space-y-4">
+        <h2 className="text-lg sm:text-xl font-semibold text-text mb-4">Последние тренировки</h2>
+        <div className="space-y-3 lg:space-y-4">
           <WorkoutCard
             title="Техника кроля"
             distance="1 600м"

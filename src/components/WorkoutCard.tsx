@@ -25,23 +25,23 @@ export default function WorkoutCard({
   isLast = false
 }: WorkoutCardProps) {
   return (
-    <div className={`bg-surface rounded-xl p-5 border border-surface-light hover:border-primary/30 transition-all duration-300 ${!isLast ? 'mb-4' : ''}`}>
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
-            <div className={`w-2 h-2 rounded-full ${
+    <div className={`bg-surface rounded-xl p-4 sm:p-5 border border-surface-light hover:border-primary/30 transition-all duration-300 ${!isLast ? 'mb-3 sm:mb-4' : ''}`}>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2">
+            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
               type === 'техника' ? 'bg-primary' :
               type === 'выносливость' ? 'bg-success' :
               type === 'скорость' ? 'bg-warning' : 'bg-purple-400'
             }`} />
-            <h3 className="text-lg font-semibold text-text">{title}</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-text truncate">{title}</h3>
           </div>
-          <p className="text-text-secondary text-sm">
+          <p className="text-text-secondary text-xs sm:text-sm">
             {distance} · {duration} · {poolSize}
           </p>
           {date && <p className="text-text-muted text-xs mt-2">{date}</p>}
         </div>
-        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${typeColors[type]}`}>
+        <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium border flex-shrink-0 ${typeColors[type]}`}>
           {type}
         </span>
       </div>
