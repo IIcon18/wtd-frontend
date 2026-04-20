@@ -1,25 +1,28 @@
 import { useState } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import { useAuth } from './context/AuthContext'
+import ProtectedRoute from './components/ProtectedRoute'
 import Sidebar from './components/Sidebar.tsx'
 import Dashboard from './pages/Dashboard.tsx'
 import Chat from './pages/Chat.tsx'
 import History from './pages/History.tsx'
 import Profile from './pages/Profile.tsx'
 import Tariffs from './pages/Tariffs.tsx'
+import Login from './pages/Login.tsx'
+import Register from './pages/Register.tsx'
 
-function App() {
+function AppLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
     <div className="flex min-h-screen bg-background text-text">
-      <Sidebar 
-        isOpen={isMobileMenuOpen} 
-        onClose={() => setIsMobileMenuOpen(false)} 
+      <Sidebar
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
       />
-      
+
       <main className="flex-1 p-4 sm:p-6 lg:p-8 lg:ml-0">
-        {/* Кнопка гамбургер (только для мобильных) */}
-        <button 
+        <button
           onClick={() => setIsMobileMenuOpen(true)}
           className="lg:hidden fixed top-4 left-4 z-30 p-3 bg-surface border border-surface-light rounded-lg text-text hover:bg-surface-light/70 transition-all shadow-lg"
         >
@@ -37,6 +40,31 @@ function App() {
         </Routes>
       </main>
     </div>
+  )
+}
+
+function GuestRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth()
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  if (user) return <Navigate to="/" replace />
+  return <>{children}</>
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
+      <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
+      <Route path="/*" element={<ProtectedRoute><AppLayout /></ProtectedRoute>} />
+    </Routes>
   )
 }
 
