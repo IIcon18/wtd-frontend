@@ -10,6 +10,34 @@ import Profile from './pages/Profile.tsx'
 import Tariffs from './pages/Tariffs.tsx'
 import Login from './pages/Login.tsx'
 import Register from './pages/Register.tsx'
+import AdminLayout from './pages/admin/AdminLayout.tsx'
+import Payments from './pages/admin/Payments.tsx'
+import Users from './pages/admin/Users.tsx'
+import Analytics from './pages/admin/Analytics.tsx'
+
+// Компонент для защиты админских роутов
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth()
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  // 🔹 Выберите ОДИН из вариантов проверки:
+
+  // Вариант А: Проверка по полю role (если есть в UserOut)
+  // if (!user || user.role !== 'admin') return <Navigate to="/" replace />
+
+  // Вариант Б: Проверка по email (для разработки)
+  const isAdmin = user?.email === 'admin@waves.com' || user?.email?.endsWith('@admin.waves.com')
+  if (!user || !isAdmin) return <Navigate to="/" replace />
+
+  return <>{children}</>
+}
 
 function AppLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -61,8 +89,19 @@ function GuestRoute({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <Routes>
+      {/* Публичные роуты */}
       <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
       <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
+
+      {/* Админ-панель */}
+      <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+        <Route index element={<Payments />} />
+        <Route path="payments" element={<Payments />} />
+        <Route path="users" element={<Users />} />
+        <Route path="analytics" element={<Analytics />} />
+      </Route>
+
+      {/* Основной сайт */}
       <Route path="/*" element={<ProtectedRoute><AppLayout /></ProtectedRoute>} />
     </Routes>
   )
