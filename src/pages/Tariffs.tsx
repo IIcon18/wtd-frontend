@@ -1,4 +1,21 @@
+import { useState } from 'react'
+import { activateTestSubscription } from '../api/subscriptions'
+
 export default function Tariffs() {
+
+  const [testLoading, setTestLoading] = useState(false)
+  const [testDone, setTestDone] = useState(false)
+
+  const handleActivateTest = async () => {
+    setTestLoading(true)
+    try {
+      await activateTestSubscription()
+      setTestDone(true)
+    } finally {
+      setTestLoading(false)
+    }
+  }
+
   const tariffs = [
     {
       name: 'РАЗОВАЯ',
@@ -50,6 +67,21 @@ export default function Tariffs() {
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-text mb-2">Тарифы</h1>
         <p className="text-text-secondary text-sm sm:text-base">Выбери подходящий формат</p>
+      </div>
+
+      {/* Тестовая подписка */}
+      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 flex items-center justify-between gap-4">
+        <div>
+          <p className="text-yellow-400 font-semibold text-sm">Режим разработки</p>
+          <p className="text-text-secondary text-xs mt-0.5">Активировать бесплатную Pro-подписку на 7 дней</p>
+        </div>
+        <button
+          onClick={handleActivateTest}
+          disabled={testLoading || testDone}
+          className="shrink-0 px-4 py-2 rounded-lg text-sm font-semibold bg-yellow-500 text-black hover:bg-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        >
+          {testDone ? '✓ Активировано' : testLoading ? 'Активация...' : 'Получить Pro'}
+        </button>
       </div>
 
       {/* Тарифы - одна колонка на мобильных */}
