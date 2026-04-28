@@ -69,7 +69,7 @@ export async function request<T>(
     if (isRefreshing) {
       // Wait for ongoing refresh
       return new Promise<T>((resolve, reject) => {
-        addRefreshListener(async _newToken => {
+        addRefreshListener(async () => {
           try {
             resolve(await request<T>(path, options, false))
           } catch (e) {
@@ -99,7 +99,7 @@ export async function request<T>(
   try {
     const err = await res.json()
     message = err.detail || message
-  } catch {}
+  } catch { /* ignore parse error */ }
 
   throw new Error(message)
 }

@@ -172,16 +172,16 @@ export default function Profile() {
             {sub ? (
               <>
                 <div className="space-y-0">
-                  {[
+                  {([
                     { label: 'Тариф', value: sub.tier === 'pro' ? 'Pro' : 'Base', highlight: true },
                     { label: 'AI-запросы', value: sub.tier === 'pro' ? 'Безлимит' : `${sub.ai_requests_today} / 3 сегодня` },
                     { label: 'Активна до', value: formatDate(sub.expires_at) },
                     { label: 'Статус', value: 'Активна', success: true },
-                  ].map(item => (
+                  ] as { label: string; value: string; highlight?: boolean; success?: boolean }[]).map(item => (
                     <div key={item.label} className="flex justify-between py-3 border-b border-surface-light last:border-0">
                       <span className="text-text-secondary text-sm">{item.label}</span>
                       <span className={`font-medium text-sm sm:text-base ${
-                        (item as any).highlight ? 'text-primary' : (item as any).success ? 'text-success' : 'text-text'
+                        item.highlight ? 'text-primary' : item.success ? 'text-success' : 'text-text'
                       }`}>
                         {item.value}
                       </span>
