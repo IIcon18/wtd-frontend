@@ -38,7 +38,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Load user on mount if token exists
   useEffect(() => {
     if (getAccessToken()) {
-      refreshUser().finally(() => setLoading(false))
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      void refreshUser().finally(() => setLoading(false))
     } else {
       setLoading(false)
     }
@@ -66,6 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext)
   if (!ctx) throw new Error('useAuth must be used inside AuthProvider')
