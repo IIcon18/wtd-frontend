@@ -1,5 +1,8 @@
+import { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { getMySubscription } from '../api/subscriptions'
+import type { SubscriptionOut } from '../api/types'
 
 interface SidebarProps {
   isOpen: boolean
@@ -16,7 +19,20 @@ const menuItems = [
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navigate = useNavigate()
-  const { logout } = useAuth()
+  const { user, logout } = useAuth()
+  const [sub, setSub] = useState<SubscriptionOut | null>(null)
+
+  useEffect(() => {
+    getMySubscription().then(setSub).catch(() => {})
+  }, [])
+
+  const initials = user?.name
+    ? user.name.split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase()
+    : '?'
+
+  const subLabel = sub?.is_active
+    ? `${sub.tier === 'pro' ? 'Pro' : 'Base'} — до ${new Date(sub.expires_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}`
+    : 'Нет подписки'
 
   return (
     <>
@@ -86,11 +102,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-surface-light/50 cursor-pointer hover:bg-surface-light/70 transition-all"
           >
             <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold flex-shrink-0">
-              АК
+              {initials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-text truncate">Алексей Козлов</p>
-              <p className="text-xs text-text-secondary">Pro — до 9 мая</p>
+              <p className="text-sm font-medium text-text truncate">{user?.name ?? '—'}</p>
+              <p className="text-xs text-text-secondary">{subLabel}</p>
             </div>
           </div>
 

@@ -2,7 +2,7 @@ interface WorkoutCardProps {
   title: string
   distance: string
   duration: string
-  poolSize: string
+  poolSize?: string
   type: "техника" | "выносливость" | "скорость" | "восстановление"
   date?: string
   isLast?: boolean
@@ -37,7 +37,7 @@ export default function WorkoutCard({
             <h3 className="text-base sm:text-lg font-semibold text-text truncate">{title}</h3>
           </div>
           <p className="text-text-secondary text-xs sm:text-sm">
-            {distance} · {duration} · {poolSize}
+            {distance} · {duration}{poolSize ? ` · ${poolSize}` : ''}
           </p>
           {date && <p className="text-text-muted text-xs mt-2">{date}</p>}
         </div>

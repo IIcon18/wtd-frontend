@@ -1,31 +1,74 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import WorkoutCard from '../components/WorkoutCard'
+import { getHistory } from '../api/history'
+import type { ChatHistoryItem } from '../api/types'
 
-const filters = ['Все', 'Техника', 'Выносливость', 'Скорость', 'Восстановление']
+const FILTERS = ['Все', 'Техника', 'Выносливость', 'Скорость', 'Восстановление']
 
-const workouts = [
-  { title: 'Техника кроля', distance: '1 600м', duration: '45 мин', poolSize: '25м бассейн', type: 'техника' as const, date: '9 апр' },
-  { title: 'Длинная выносливость', distance: '2 000м', duration: '60 мин', poolSize: '25м бассейн', type: 'выносливость' as const, date: '8 апр' },
-  { title: 'Скоростная интервальная', distance: '2 500м', duration: '45 мин', poolSize: '50м бассейн', type: 'скорость' as const, date: '7 апр' },
-  { title: 'Восстановительная', distance: '1 000м', duration: '30 мин', poolSize: '25м бассейн', type: 'восстановление' as const, date: '6 апр' },
-]
+const TYPE_MAP: Record<string, 'техника' | 'выносливость' | 'скорость' | 'восстановление'> = {
+  technique: 'техника',
+  endurance: 'выносливость',
+  speed: 'скорость',
+  recovery: 'восстановление',
+}
+
+const TITLE_MAP: Record<string, string> = {
+  technique: 'Тренировка по технике',
+  endurance: 'Тренировка на выносливость',
+  speed: 'Скоростная тренировка',
+  recovery: 'Восстановительная тренировка',
+}
+
+const FILTER_TO_TYPE: Record<string, string> = {
+  Техника: 'техника',
+  Выносливость: 'выносливость',
+  Скорость: 'скорость',
+  Восстановление: 'восстановление',
+}
+
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
+}
 
 export default function History() {
   const [activeFilter, setActiveFilter] = useState('Все')
-  const filteredWorkouts = activeFilter === 'Все' 
-    ? workouts 
-    : workouts.filter(w => w.type === activeFilter.toLowerCase())
+  const [sessions, setSessions] = useState<ChatHistoryItem[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    getHistory()
+      .then(setSessions)
+      .catch(() => setSessions([]))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const filtered = activeFilter === 'Все'
+    ? sessions
+    : sessions.filter(s => TYPE_MAP[s.workout_type] === FILTER_TO_TYPE[activeFilter])
+
+  const totalDistanceM = sessions.reduce((sum, s) => sum + s.distance_m, 0)
+  const totalKm = totalDistanceM >= 1000
+    ? `${(totalDistanceM / 1000).toFixed(1)} км`
+    : `${totalDistanceM} м`
 
   return (
     <div className="space-y-6 lg:space-y-8 pt-12 lg:pt-0">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-text mb-2">История тренировок</h1>
-        <p className="text-text-secondary text-sm sm:text-base">Всего 14 тренировок · 24 000м</p>
+        {loading ? (
+          <p className="text-text-secondary text-sm">Загрузка...</p>
+        ) : (
+          <p className="text-text-secondary text-sm sm:text-base">
+            {sessions.length > 0
+              ? `Всего ${sessions.length} ${sessions.length === 1 ? 'тренировка' : sessions.length < 5 ? 'тренировки' : 'тренировок'} · ${totalKm}`
+              : 'Тренировок пока нет'}
+          </p>
+        )}
       </div>
 
-      {/* Фильтры - горизонтальный скролл */}
+      {/* Filters */}
       <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-hide">
-        {filters.map((filter) => (
+        {FILTERS.map(filter => (
           <button
             key={filter}
             onClick={() => setActiveFilter(filter)}
@@ -40,11 +83,33 @@ export default function History() {
         ))}
       </div>
 
-      <div className="space-y-3 lg:space-y-4">
-        {filteredWorkouts.map((workout, index) => (
-          <WorkoutCard key={index} {...workout} isLast={index === filteredWorkouts.length - 1} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-20 bg-surface rounded-xl border border-surface-light animate-pulse" />
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="bg-surface rounded-xl p-8 border border-surface-light text-center">
+          <p className="text-text-secondary text-sm">
+            {sessions.length === 0 ? 'Тренировок пока нет. Начни с чата с тренером!' : 'Нет тренировок по выбранному фильтру'}
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-3 lg:space-y-4">
+          {filtered.map((item, index) => (
+            <WorkoutCard
+              key={item.id}
+              title={TITLE_MAP[item.workout_type] ?? item.workout_type}
+              distance={item.distance_m >= 1000 ? `${(item.distance_m / 1000).toFixed(1)} км` : `${item.distance_m} м`}
+              duration={`${item.duration_min} мин`}
+              type={TYPE_MAP[item.workout_type] ?? 'техника'}
+              date={formatDate(item.created_at)}
+              isLast={index === filtered.length - 1}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

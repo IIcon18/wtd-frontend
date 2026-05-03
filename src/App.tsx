@@ -14,6 +14,8 @@ import AdminLayout from './pages/admin/AdminLayout.tsx'
 import Payments from './pages/admin/Payments.tsx'
 import Users from './pages/admin/Users.tsx'
 import Analytics from './pages/admin/Analytics.tsx'
+import ProfileSetup from './pages/ProfileSetup.tsx'
+import SwimProfileSetupModal from './components/SwimProfileSetupModal.tsx'
 
 // Компонент для защиты админских роутов
 function AdminRoute({ children }: { children: React.ReactNode }) {
@@ -59,6 +61,7 @@ function AppLayout() {
           </svg>
         </button>
 
+        <SwimProfileSetupModal />
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/chat" element={<Chat />} />
@@ -100,6 +103,9 @@ function App() {
         <Route path="users" element={<Users />} />
         <Route path="analytics" element={<Analytics />} />
       </Route>
+
+      {/* Настройка профиля после регистрации */}
+      <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetup /></ProtectedRoute>} />
 
       {/* Основной сайт */}
       <Route path="/*" element={<ProtectedRoute><AppLayout /></ProtectedRoute>} />
