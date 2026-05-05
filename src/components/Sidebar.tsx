@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { getMySubscription } from '../api/subscriptions'
-import type { SubscriptionOut } from '../api/types'
+import { useSubscription } from '../context/SubscriptionContext'
 
 interface SidebarProps {
   isOpen: boolean
@@ -20,11 +18,7 @@ const menuItems = [
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navigate = useNavigate()
   const { user, logout } = useAuth()
-  const [sub, setSub] = useState<SubscriptionOut | null>(null)
-
-  useEffect(() => {
-    getMySubscription().then(setSub).catch(() => {})
-  }, [])
+  const { sub } = useSubscription()
 
   const initials = user?.name
     ? user.name.split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase()
