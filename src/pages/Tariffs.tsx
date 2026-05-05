@@ -103,7 +103,7 @@ export default function Tariffs() {
 
     run()
     return () => { cancelled = true }
-  }, [paymentResult])
+  }, [paymentResult, refreshSubscription])
 
   const handleBuy = async (tier: PaymentTier) => {
     setBuyError('')
@@ -111,7 +111,7 @@ export default function Tariffs() {
     try {
       const res = await createPayment(tier)
       localStorage.setItem(PENDING_PAYMENT_KEY, String(res.payment_id))
-      window.location.href = res.confirmation_url
+      window.location.assign(res.confirmation_url)
     } catch (e: unknown) {
       setBuyError(e instanceof Error ? e.message : 'Ошибка при создании платежа')
       setLoadingTier(null)

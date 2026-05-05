@@ -41,23 +41,32 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   }, [fetchSub])
 
   useEffect(() => {
-    if (!user) {
-      setSub(null)
-      setSubLoading(false)
-      return
+    let cancelled = false
+
+    const init = async () => {
+      if (!user) {
+        setSub(null)
+        setSubLoading(false)
+        return
+      }
+
+      setSubLoading(true)
+      await fetchSub()
+      if (!cancelled) setSubLoading(false)
+
+      if (!cancelled) {
+        timerRef.current = setInterval(() => { void fetchSub() }, POLL_INTERVAL_MS)
+      }
     }
 
-    // Первая загрузка
-    setSubLoading(true)
-    fetchSub().finally(() => setSubLoading(false))
-
-    // Поллинг каждые 30 сек
-    timerRef.current = setInterval(() => {
-      fetchSub()
-    }, POLL_INTERVAL_MS)
+    void init()
 
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current)
+      cancelled = true
+      if (timerRef.current) {
+        clearInterval(timerRef.current)
+        timerRef.current = null
+      }
     }
   }, [user, fetchSub])
 
