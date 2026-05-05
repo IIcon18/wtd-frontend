@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
+import { SubscriptionProvider } from './context/SubscriptionContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Sidebar from './components/Sidebar.tsx'
 import Dashboard from './pages/Dashboard.tsx'
@@ -108,7 +109,7 @@ function App() {
       <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetup /></ProtectedRoute>} />
 
       {/* Основной сайт */}
-      <Route path="/*" element={<ProtectedRoute><AppLayout /></ProtectedRoute>} />
+      <Route path="/*" element={<ProtectedRoute><SubscriptionProvider><AppLayout /></SubscriptionProvider></ProtectedRoute>} />
     </Routes>
   )
 }

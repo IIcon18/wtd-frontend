@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { sendMessage, getChatHistory } from '../api/chat'
 import type { ChatHistoryItem } from '../api/types'
+import WorkoutMessage from '../components/WorkoutMessage'
 
 interface Message {
   id: number
@@ -97,17 +98,17 @@ export default function Chat() {
         ) : (
           messages.map(message => (
             <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-xs sm:max-w-2xl border rounded-2xl px-4 sm:px-6 py-3 sm:py-4 ${
+              <div className={`border rounded-2xl px-4 sm:px-5 py-3 sm:py-4 ${
                 message.sender === 'user'
-                  ? 'bg-primary/20 border-primary/30'
-                  : 'bg-surface border-surface-light'
+                  ? 'max-w-xs sm:max-w-lg bg-primary/20 border-primary/30'
+                  : 'w-full max-w-2xl bg-surface border-surface-light'
               }`}>
                 {message.sender === 'ai' && (
-                  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-xs text-white mb-2">
+                  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-xs text-white mb-3">
                     WD
                   </div>
                 )}
-                <p className="text-text text-sm sm:text-base whitespace-pre-wrap">{message.content}</p>
+                <WorkoutMessage content={message.content} isAi={message.sender === 'ai'} />
               </div>
             </div>
           ))
