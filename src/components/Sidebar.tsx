@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useSubscription } from '../context/SubscriptionContext'
 
@@ -17,8 +17,10 @@ const menuItems = [
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navigate = useNavigate()
+  const location = useLocation()
   const { user, logout } = useAuth()
   const { sub } = useSubscription()
+  const isAdmin = user?.role === 'admin'
 
   const initials = user?.name
     ? user.name.split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase()
@@ -85,6 +87,23 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             ))}
           </ul>
         </nav>
+
+        {/* Кнопка админки */}
+        {isAdmin && (
+          <div className="px-4 pb-2">
+            <button
+              onClick={() => { navigate('/admin'); onClose() }}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                location.pathname.startsWith('/admin')
+                  ? 'bg-warning/10 text-warning border-l-4 border-warning'
+                  : 'text-text-secondary hover:bg-surface-light hover:text-text border-l-4 border-transparent'
+              }`}
+            >
+              <span className="text-2xl">⚙️</span>
+              <span className="font-medium">Админ панель</span>
+            </button>
+          </div>
+        )}
 
         {/* User Card */}
         <div className="p-4 border-t border-surface-light">
