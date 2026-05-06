@@ -32,12 +32,7 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
 
   // 🔹 Выберите ОДИН из вариантов проверки:
 
-  // Вариант А: Проверка по полю role (если есть в UserOut)
-  // if (!user || user.role !== 'admin') return <Navigate to="/" replace />
-
-  // Вариант Б: Проверка по email (для разработки)
-  const isAdmin = user?.email === 'admin@waves.com' || user?.email?.endsWith('@admin.waves.com')
-  if (!user || !isAdmin) return <Navigate to="/" replace />
+  if (!user || user.role !== 'admin') return <Navigate to="/" replace />
 
   return <>{children}</>
 }
