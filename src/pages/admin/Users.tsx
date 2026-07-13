@@ -186,7 +186,12 @@ export default function Users() {
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    adminGetUsers()
+      .then(setItems)
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
 
   const filtered = items.filter(({ user }) =>
     user.name.toLowerCase().includes(search.toLowerCase()) ||
